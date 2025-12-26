@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finanças V1</title>
+    <title>Finanças V1 - Sistema Seguro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -25,6 +25,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Disponibiliza para o escopo global
         window.db = db;
         window.auth = auth;
         window.firestore = { collection, addDoc, onSnapshot, query, deleteDoc, doc, updateDoc, orderBy };
@@ -46,118 +47,132 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; margin: 0; }
-        .sidebar { width: 260px; background-color: #0f172a; color: white; height: 100vh; position: fixed; left: 0; top: 0; z-index: 50; }
-        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); min-height: 100vh; position: relative; }
-        .card-financeiro { background: white; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 24px; color: #94a3b8; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; }
+        
+        /* Reset de Layout V3.0 */
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        .sidebar { width: 260px; background-color: #0f172a; color: white; display: flex; flex-direction: column; height: 100vh; position: fixed; left: 0; top: 0; z-index: 40; }
+        
+        .main-content { flex: 1; margin-left: 260px; padding: 40px; min-height: 100vh; width: calc(100% - 260px); }
+        
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 24px; color: #94a3b8; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
+        .nav-item:hover { background: #1e293b; color: white; }
         .nav-item.active { background: #1e293b; color: white; border-left-color: #3b82f6; }
-        .btn-canal { border: 2px solid; opacity: 0.5; font-weight: 900; transition: 0.2s; }
+        
+        .card-financeiro { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        
+        /* Botões de Canais V3.0 */
+        .btn-canal { border: 2px solid; transition: 0.3s; opacity: 0.5; font-weight: 900; cursor: pointer; border-radius: 12px; padding: 10px; text-align: center; }
         .btn-canal.active { opacity: 1; color: white !important; transform: scale(1.05); }
-        .color-ifood { background-color: #ea1d2c; border-color: #ea1d2c; }
-        .color-keeta { background-color: #004d40; border-color: #004d40; }
-        .color-loja { background-color: #64748b; border-color: #64748b; }
-        .color-whatsapp { background-color: #25d366; border-color: #25d366; }
-        .page-content { display: none; }
-        .page-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .btn-loja { border-color: #64748b; color: #64748b; } .btn-loja.active { background-color: #64748b; }
+        .btn-ifood { border-color: #ea1d2c; color: #ea1d2c; } .btn-ifood.active { background-color: #ea1d2c; }
+        .btn-keeta { border-color: #004d40; color: #004d40; } .btn-keeta.active { background-color: #004d40; }
+        .btn-whatsapp { border-color: #25d366; color: #25d366; } .btn-whatsapp.active { background-color: #25d366; }
+
+        .color-ifood { background-color: #ea1d2c; } .color-keeta { background-color: #004d40; }
+        .color-loja { background-color: #64748b; } .color-whatsapp { background-color: #25d366; }
+
+        .page-content { display: none; width: 100%; }
+        .page-content.active { display: block; }
     </style>
 </head>
-<body class="flex">
+<body>
 
     <div id="login-screen" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-[100]">
         <div class="bg-white p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl text-center">
-            <h1 class="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter italic">FINANÇAS <span class="text-blue-600">PRO</span></h1>
-            <p class="text-slate-400 text-[10px] font-black mb-8 uppercase tracking-[0.3em]">Sistema de Gestão Privado</p>
+            <h1 class="text-3xl font-black text-slate-800 mb-2 uppercase tracking-tighter italic">Finanças<span class="text-blue-600">V1</span></h1>
+            <p class="text-slate-400 text-[10px] font-black mb-8 uppercase tracking-[0.3em]">Acesso Administrativo</p>
             <div class="space-y-4">
-                <input type="email" id="login-email" placeholder="Seu E-mail" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-blue-500 transition-all">
-                <input type="password" id="login-senha" placeholder="Sua Senha" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold outline-none focus:border-blue-500 transition-all">
-                <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Entrar no Painel</button>
+                <input type="email" id="login-email" placeholder="E-mail" class="w-full p-4 bg-slate-50 border-2 rounded-2xl font-bold outline-none focus:border-blue-500">
+                <input type="password" id="login-senha" placeholder="Senha" class="w-full p-4 bg-slate-50 border-2 rounded-2xl font-bold outline-none focus:border-blue-500">
+                <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-lg hover:bg-blue-700 transition-all">Entrar</button>
             </div>
-            <p id="login-erro" class="mt-4 text-red-500 text-[10px] font-black uppercase hidden">Acesso negado!</p>
+            <p id="login-erro" class="mt-4 text-red-500 text-[10px] font-black uppercase hidden">Dados incorretos</p>
         </div>
     </div>
 
-    <div id="app-screen" style="display: none;" class="w-full h-screen">
+    <div id="app-screen" style="display: none;">
         <aside class="sidebar">
-            <div class="p-8"><h1 class="text-lg font-black text-white italic">FINANÇAS <span class="text-blue-500">PRO</span></h1></div>
+            <div class="p-8">
+                <h1 class="text-sm font-black text-white uppercase tracking-widest">Finanças <span class="text-blue-500">V1</span></h1>
+            </div>
             <nav class="flex-1">
-                <div class="nav-item active" onclick="showPage('vendas')"><i data-lucide="layout-dashboard"></i> Dashboard</div>
-                <div class="nav-item" onclick="showPage('estoque')"><i data-lucide="package"></i> Estoque</div>
-                <div class="nav-item" onclick="showPage('boletos')"><i data-lucide="receipt"></i> Boletos</div>
-                <div class="nav-item" onclick="showPage('fluxo')"><i data-lucide="arrow-up-down"></i> Fluxo</div>
+                <div class="nav-item active" onclick="showPage('vendas')"><i data-lucide="shopping-cart" class="w-5 h-5"></i> Lançar Vendas</div>
+                <div class="nav-item" onclick="showPage('estoque')"><i data-lucide="package" class="w-5 h-5"></i> Controle de Estoque</div>
+                <div class="nav-item" onclick="showPage('boletos')"><i data-lucide="receipt" class="w-5 h-5"></i> Custos e Boletos</div>
+                <div class="nav-item" onclick="showPage('fluxo')"><i data-lucide="arrow-left-right" class="w-5 h-5"></i> Fluxo de Caixa</div>
             </nav>
             <div class="p-6 border-t border-slate-800">
-                <button onclick="fazerLogout()" class="text-slate-500 hover:text-white font-black text-[10px] uppercase flex items-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Sair</button>
+                <button onclick="fazerLogout()" class="flex items-center gap-2 text-slate-400 hover:text-white font-black text-[10px] uppercase">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair do Sistema
+                </button>
             </div>
         </aside>
 
         <main class="main-content">
             <div id="page-vendas" class="page-content active">
-                <div class="flex justify-between items-end mb-8">
-                    <div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resumo Geral</p><h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Dashboard de Vendas</h2></div>
-                    <div class="flex gap-2 bg-white p-2 rounded-2xl border shadow-sm">
+                <header class="mb-8 flex justify-between items-center">
+                    <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Resumo de Vendas</h2>
+                    <div class="flex gap-2 bg-white p-2 rounded-xl border">
                         <input type="date" id="data-inicio" onchange="atualizarInterfaceVendas()" class="text-[10px] font-bold outline-none">
                         <input type="date" id="data-fim" onchange="atualizarInterfaceVendas()" class="text-[10px] font-bold outline-none">
                     </div>
-                </div>
+                </header>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="card-financeiro bg-blue-600 text-white border-none">
-                        <p class="text-[10px] font-bold uppercase opacity-80">Faturamento Bruto</p>
-                        <h3 id="geral-bruto" class="text-3xl font-black">R$ 0,00</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div class="card-financeiro border-t-4 border-blue-500">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Faturamento Bruto</p>
+                        <h3 id="geral-bruto" class="text-3xl font-black text-slate-800">R$ 0,00</h3>
                     </div>
-                    <div class="card-financeiro">
-                        <p class="text-[10px] font-black text-slate-400 uppercase">Margem Média</p>
-                        <h3 id="geral-margem" class="text-3xl font-black text-blue-600">0%</h3>
-                    </div>
-                    <div class="card-financeiro bg-emerald-500 text-white border-none">
-                        <p class="text-[10px] font-bold uppercase opacity-80">Lucro Líquido</p>
-                        <h3 id="lucro-acumulado" class="text-3xl font-black">R$ 0,00</h3>
+                    <div class="card-financeiro border-t-4 border-green-500">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Margem Período</p>
+                        <h3 id="geral-margem" class="text-3xl font-black text-green-600">0%</h3>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid lg:grid-cols-3 gap-8">
                     <div class="card-financeiro h-fit">
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-4">Novo Lançamento</p>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <button onclick="setCanal('loja')" id="btn-loja" class="btn-canal btn-loja active p-3 rounded-xl text-[9px] color-loja">LOJA</button>
-                            <button onclick="setCanal('ifood')" id="btn-ifood" class="btn-canal btn-ifood p-3 rounded-xl text-[9px] color-ifood">IFOOD</button>
-                            <button onclick="setCanal('keeta')" id="btn-keeta" class="btn-canal btn-keeta p-3 rounded-xl text-[9px] color-keeta">KEETA</button>
-                            <button onclick="setCanal('whatsapp')" id="btn-whatsapp" class="btn-canal btn-whatsapp p-3 rounded-xl text-[9px] color-whatsapp">ZAP</button>
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-4 text-center">Novo Lançamento</p>
+                        <div class="grid grid-cols-2 gap-2 mb-6">
+                            <button onclick="setCanal('loja')" id="btn-loja" class="btn-canal btn-loja active text-[9px]">LOJA</button>
+                            <button onclick="setCanal('ifood')" id="btn-ifood" class="btn-canal btn-ifood text-[9px]">IFOOD</button>
+                            <button onclick="setCanal('keeta')" id="btn-keeta" class="btn-canal btn-keeta text-[9px]">KEETA</button>
+                            <button onclick="setCanal('whatsapp')" id="btn-whatsapp" class="btn-canal btn-whatsapp text-[9px]">ZAP</button>
                         </div>
-                        <input type="number" id="venda-bruta" placeholder="Valor Bruto R$" class="w-full p-4 mb-3 bg-slate-50 border rounded-xl font-black outline-none">
-                        <input type="number" id="venda-cmv" placeholder="Custo (CMV) R$" class="w-full p-4 mb-6 bg-slate-50 border rounded-xl font-black outline-none">
-                        <button onclick="registrarVenda()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest">Registrar</button>
+                        <input type="number" id="venda-bruta" placeholder="Bruto R$" class="w-full p-4 mb-3 bg-slate-50 border rounded-xl font-black outline-none">
+                        <input type="number" id="venda-cmv" placeholder="CMV R$" class="w-full p-4 mb-6 bg-slate-50 border rounded-xl font-black outline-none">
+                        <button onclick="registrarVenda()" class="w-full bg-slate-900 text-white py-5 rounded-xl font-black uppercase text-xs tracking-widest">Registrar Venda</button>
                     </div>
-                    <div class="lg:col-span-2 grid grid-cols-2 gap-4 h-fit" id="grid-canais"></div>
+
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="card-financeiro bg-slate-50 border-none">
+                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Lucro Líquido Acumulado</p>
+                            <h2 id="lucro-acumulado" class="text-5xl font-black text-slate-800">R$ 0,00</h2>
+                            <p id="texto-status-meta" class="mt-4 text-[10px] font-bold text-slate-500 uppercase italic"></p>
+                        </div>
+                        <div id="grid-canais" class="grid grid-cols-2 gap-4"></div>
+                    </div>
                 </div>
             </div>
 
             <div id="page-estoque" class="page-content">
-                <h2 class="text-2xl font-black mb-8 uppercase tracking-tighter">Controle de Estoque</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div class="card-financeiro h-fit"><input type="text" id="est-nome" placeholder="Produto" class="w-full p-3 mb-2 bg-slate-50 border rounded-xl font-bold"><input type="number" id="est-qtd" placeholder="Qtd" class="w-full p-3 mb-4 bg-slate-50 border rounded-xl font-bold"><button onclick="registrarEstoque()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black">Lançar</button></div>
-                    <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4" id="lista-estoque-agrupada"></div>
+                <header class="mb-8"><h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Estoque & Aging</h2></header>
+                <div class="grid lg:grid-cols-4 gap-6">
+                    <div class="card-financeiro h-fit">
+                        <input type="text" id="est-nome" placeholder="Produto" class="w-full p-4 mb-2 bg-slate-50 border rounded-xl font-bold">
+                        <input type="number" id="est-qtd" placeholder="Qtd Inicial" class="w-full p-4 mb-4 bg-slate-50 border rounded-xl font-bold">
+                        <button onclick="registrarEstoque()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[10px]">Cadastrar</button>
+                    </div>
+                    <div class="lg:col-span-3 grid grid-cols-2 gap-4" id="lista-estoque-agrupada"></div>
                 </div>
             </div>
-
-            <div id="page-boletos" class="page-content">
-                <div class="flex justify-between items-center mb-8"><h2 class="text-2xl font-black uppercase tracking-tighter">Gestão de Boletos</h2><h3 id="total-custos-display" class="text-2xl font-black text-red-500">R$ 0,00</h3></div>
-                <div class="card-financeiro grid grid-cols-4 gap-3 mb-8"><input type="text" id="bol-nome" placeholder="Conta" class="p-4 bg-slate-50 border rounded-xl font-bold"><input type="number" id="bol-valor" placeholder="Valor" class="p-4 bg-slate-50 border rounded-xl font-bold"><input type="date" id="bol-venc" class="p-4 bg-slate-50 border rounded-xl font-bold"><button onclick="registrarBoleto()" class="bg-slate-900 text-white font-black rounded-xl">Salvar</button></div>
-                <div id="lista-boletos" class="space-y-3"></div>
-            </div>
-
-            <div id="page-fluxo" class="page-content">
-                <h2 class="text-2xl font-black mb-8 uppercase tracking-tighter">Fluxo de Caixa Diário</h2>
-                <div id="lista-fluxo-dias" class="space-y-3"></div>
-            </div>
-        </main>
+            
+            </main>
     </div>
 
     <script>
-        // MANTENDO TODA A LÓGICA V3.0 FUNCIONAL
-        let vendas = [], boletos = [], estoque = [];
+        let vendas = [], estoque = [];
         let canalSelecionado = 'loja';
 
         async function fazerLogin() {
@@ -165,6 +180,7 @@
             try { await window.firebaseAuth.signInWithEmailAndPassword(window.auth, e, s); } 
             catch { document.getElementById('login-erro').classList.remove('hidden'); }
         }
+
         async function fazerLogout() { await window.firebaseAuth.signOut(window.auth); }
 
         function showPage(id) {
@@ -190,10 +206,6 @@
                 vendas = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
                 atualizarInterfaceVendas();
             });
-            window.firestore.onSnapshot(window.firestore.collection(window.db, "boletos"), (snap) => {
-                boletos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                atualizarInterfaceBoletos();
-            });
             window.firestore.onSnapshot(window.firestore.collection(window.db, "estoque"), (snap) => {
                 estoque = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
                 atualizarInterfaceEstoque();
@@ -210,11 +222,34 @@
             document.getElementById('venda-bruta').value = ""; document.getElementById('venda-cmv').value = "";
         }
 
-        async function registrarBoleto() {
-            const n = document.getElementById('bol-nome').value, v = parseFloat(document.getElementById('bol-valor').value) || 0, d = document.getElementById('bol-venc').value;
-            if(!n || v === 0 || !d) return;
-            await window.firestore.addDoc(window.firestore.collection(window.db, "boletos"), { nome: n, valor: v, venc: d });
-            document.getElementById('bol-nome').value = ""; document.getElementById('bol-valor').value = "";
+        function atualizarInterfaceVendas() {
+            const dI = document.getElementById('data-inicio').value, dF = document.getElementById('data-fim').value;
+            let tb = 0, tl = 0; const res = { loja:0, ifood:0, keeta:0, whatsapp:0 };
+            vendas.filter(v => v.data >= dI && v.data <= dF).forEach(v => {
+                tb += v.bruto; tl += v.lucro; res[v.canal] += v.lucro;
+            });
+            document.getElementById('geral-bruto').innerText = `R$ ${tb.toLocaleString('pt-br', {minimumFractionDigits:2})}`;
+            document.getElementById('geral-margem').innerText = `${tb > 0 ? (tl/tb*100).toFixed(1) : 0}%`;
+            document.getElementById('lucro-acumulado').innerText = `R$ ${tl.toLocaleString('pt-br', {minimumFractionDigits:2})}`;
+            
+            const grid = document.getElementById('grid-canais'); grid.innerHTML = "";
+            for(let k in res) {
+                grid.innerHTML += `<div class="card-financeiro text-white color-${k} border-none">
+                    <p class="text-[9px] font-black uppercase opacity-80">${k}</p>
+                    <h3 class="text-xl font-black">R$ ${res[k].toFixed(2)}</h3>
+                </div>`;
+            }
+        }
+
+        function atualizarInterfaceEstoque() {
+            const cont = document.getElementById('lista-estoque-agrupada'); cont.innerHTML = "";
+            estoque.forEach(i => {
+                const dias = Math.floor((new Date() - new Date(i.data)) / 86400000);
+                cont.innerHTML += `<div class="card-financeiro flex flex-col gap-2">
+                    <div class="flex justify-between items-start"><span class="font-black uppercase text-xs">${i.nome}</span><span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-[9px] font-bold">${dias} DIAS</span></div>
+                    <div class="flex justify-between items-center"><span class="text-2xl font-black">${i.qtd}</span><button onclick="vendaEstoque('${i.id}', ${i.qtd})" class="text-blue-600 font-black text-[10px]">SAÍDA</button></div>
+                </div>`;
+            });
         }
 
         async function registrarEstoque() {
@@ -224,65 +259,6 @@
             document.getElementById('est-nome').value = ""; document.getElementById('est-qtd').value = "";
         }
 
-        function atualizarInterfaceVendas() {
-            const dI = document.getElementById('data-inicio').value, dF = document.getElementById('data-fim').value;
-            let tb = 0, tl = 0; const res = { loja:0, ifood:0, keeta:0, whatsapp:0 };
-            vendas.filter(v => v.data >= dI && v.data <= dF).forEach(v => {
-                tb += v.bruto; tl += v.lucro; res[v.canal] += v.lucro;
-            });
-            document.getElementById('geral-bruto').innerText = `R$ ${tb.toFixed(2)}`;
-            document.getElementById('geral-margem').innerText = `${tb > 0 ? (tl/tb*100).toFixed(1) : 0}%`;
-            document.getElementById('lucro-acumulado').innerText = `R$ ${tl.toFixed(2)}`;
-            const grid = document.getElementById('grid-canais'); grid.innerHTML = "";
-            for(let k in res) {
-                grid.innerHTML += `<div class="card-financeiro text-white color-${k} border-none">
-                    <p class="text-[9px] font-black uppercase opacity-80">${k}</p>
-                    <h3 class="text-xl font-black">R$ ${res[k].toFixed(2)}</h3>
-                </div>`;
-            }
-            atualizarFluxo();
-        }
-
-        function atualizarInterfaceEstoque() {
-            const cont = document.getElementById('lista-estoque-agrupada'); cont.innerHTML = "";
-            estoque.forEach(i => {
-                const dias = Math.floor((new Date() - new Date(i.data)) / 86400000);
-                cont.innerHTML += `<div class="card-financeiro flex flex-col gap-2">
-                    <div class="flex justify-between items-start"><span class="font-black uppercase text-xs">${i.nome}</span><span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-[9px] font-bold">${dias} DIAS</span></div>
-                    <div class="flex justify-between items-center"><span class="text-2xl font-black">${i.qtd}</span><button onclick="novaVendaEstoque('${i.id}', ${i.qtd})" class="text-blue-600 font-black text-[10px]">SAÍDA</button></div>
-                </div>`;
-            });
-        }
-
-        async function novaVendaEstoque(id, qA) {
-            const q = prompt("Vendeu quanto?");
-            if(q) await window.firestore.updateDoc(window.firestore.doc(window.db, "estoque", id), { qtd: Math.max(0, qA - parseFloat(q)) });
-        }
-
-        function atualizarInterfaceBoletos() {
-            const list = document.getElementById('lista-boletos'); list.innerHTML = ""; let t = 0;
-            boletos.forEach(b => {
-                t += b.valor;
-                list.innerHTML += `<div class="flex justify-between items-center p-4 bg-white border rounded-2xl">
-                    <h4 class="font-black text-slate-700 uppercase text-xs">${b.nome}</h4>
-                    <b class="text-red-500 font-black">R$ ${b.valor.toFixed(2)}</b>
-                </div>`;
-            });
-            document.getElementById('total-custos-display').innerText = `R$ ${t.toFixed(2)}`;
-        }
-
-        function atualizarFluxo() {
-            const cont = document.getElementById('lista-fluxo-dias'); cont.innerHTML = "";
-            const dias = {};
-            vendas.forEach(v => { if(!dias[v.data]) dias[v.data] = 0; dias[v.data] += v.lucro; });
-            boletos.forEach(b => { if(!dias[b.venc]) dias[b.venc] = 0; dias[b.venc] -= b.valor; });
-            Object.keys(dias).sort().reverse().forEach(d => {
-                cont.innerHTML += `<div class="card-financeiro flex justify-between items-center">
-                    <span class="font-black text-slate-500 text-xs">${d}</span>
-                    <span class="font-black ${dias[d] >= 0 ? 'text-green-600' : 'text-red-600'}">R$ ${dias[d].toFixed(2)}</span>
-                </div>`;
-            });
-        }
         lucide.createIcons();
     </script>
 </body>
